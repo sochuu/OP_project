@@ -25,7 +25,11 @@ pandas и scikit-learn на VPS не используются.
 Код запрашивается по почте (на старнице авторизации есть необходимый mailto) или возможно взять один из демо-ключей:
 
 
-
+584J-SPL6-R4T4-S8NL
+RTFS-5YLA-CATK-M46K
+T4ZG-RMR2-H6AD-YALY
+CC67-V9H3-BDDD-KURR
+U8Q6-7AKH-A3PJ-4ZFZ
 
 
 
