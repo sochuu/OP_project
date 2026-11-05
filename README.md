@@ -40,3 +40,6 @@ pandas и scikit-learn на VPS не используются.
 На Linux/VPS: `./run.sh`, выдача кода — `python scripts/issue_code.py`.
 
 
+## Используемые ресурсы
+
+HTML/CSS шаблон от https://www.keentodesign.com.au/web-design-templates/cyber-security-website-template/
