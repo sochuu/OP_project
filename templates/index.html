@@ -8,8 +8,13 @@
 </head>
 <body class="bg-light">
 <div class="container py-4">
-  <h1 class="h3 mb-1">Прогноз налогов для фрилансера</h1>
-  <p class="text-muted">РФ: НПД (4/3% физлица, 6/4% ИП/юрлица), УСН, НДФЛ.</p>
+  <div class="d-flex justify-content-between align-items-start">
+    <div>
+      <h1 class="h3 mb-1">Прогноз налогов для фрилансера</h1>
+      <p class="text-muted">РФ: НПД (4/3% физлица, 6/4% ИП/юрлица), УСН, НДФЛ.</p>
+    </div>
+    <a class="btn btn-outline-secondary btn-sm" href="/logout">Выйти</a>
+  </div>
 
   <div class="row g-3 mb-4">
     <div class="col-md-4">
@@ -57,10 +62,7 @@
               <label class="form-label small">Год</label>
               <input class="form-control" type="number" name="financial_year" value="{{ settings.financial_year }}">
             </div>
-            <div class="col-6">
-              <label class="form-label small">Бонус НПД, ₽</label>
-              <input class="form-control" type="number" step="0.01" name="npd_bonus_left" value="{{ settings.npd_bonus_left }}">
-            </div>
+            <input type="hidden" name="npd_bonus_left" value="{{ settings.npd_bonus_left }}">
             <div class="col-6">
               <label class="form-label small">Ставка УСН, %</label>
               <input class="form-control" type="number" step="0.1" name="usn_rate" value="{{ settings.usn_rate }}">
@@ -71,7 +73,30 @@
             </div>
             <div class="col-12"><button class="btn btn-primary w-100">Сохранить</button></div>
           </form>
-          <p class="small text-muted mt-2 mb-0">НПД: ФЛ 4% (3% с бонусом), ИП/ЮЛ 6% (4% с бонусом). Вычет до 10 000 ₽.</p>
+          <p class="small text-muted mt-2 mb-0">НПД: ФЛ 4% (3% с бонусом), ИП/ЮЛ 6% (4% с бонусом). Вычет до {{ "%.0f"|format(bonus_max) }} ₽ задаётся кнопкой ниже.</p>
+        </div>
+      </div>
+      <div class="card shadow-sm mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>Налоговый бонус НПД</span>
+          <span class="badge text-bg-secondary">остаток {{ "%.0f"|format(bonus_now) }} ₽</span>
+        </div>
+        <div class="card-body">
+          <p class="small text-muted">Старт вычета задаётся здесь. После каждой операции остаток уменьшается: 1% от дохода ФЛ и 2% от ИП/ЮЛ. 0 ₽ — ставки полные (4% и 6%).</p>
+          <p class="small mb-2">Истрачено по операциям: <strong>{{ "%.0f"|format(bonus_used) }} ₽</strong> · сейчас: <strong>{{ "%.0f"|format(bonus_now) }} ₽</strong></p>
+          <form method="post" action="/bonus" class="row g-2 align-items-end">
+            <div class="col-7">
+              <label class="form-label small">Стартовый бонус, ₽</label>
+              <input class="form-control" type="number" name="npd_bonus_left" min="0" max="{{ bonus_max }}" step="1" value="{{ bonus_start }}">
+            </div>
+            <div class="col-5">
+              <button class="btn btn-outline-primary w-100" type="submit">Указать бонус</button>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-outline-secondary btn-sm" type="button" onclick="this.form.npd_bonus_left.value=0; this.form.submit()">Бонус истрачен (0)</button>
+              <button class="btn btn-outline-secondary btn-sm" type="button" onclick="this.form.npd_bonus_left.value={{ bonus_max }}; this.form.submit()">Полный вычет ({{ "%.0f"|format(bonus_max) }})</button>
+            </div>
+          </form>
         </div>
       </div>
       <div class="card shadow-sm mb-3">
@@ -104,6 +129,12 @@
       </div>
     </div>
     <div class="col-lg-7">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header">Гистограмма: факт и прогноз по месяцам</div>
+        <div class="card-body">
+          <canvas id="incomeChart" height="140"></canvas>
+        </div>
+      </div>
       <div class="card shadow-sm mb-3">
         <div class="card-header">Месяцы: факт и прогноз</div>
         <div class="table-responsive">
@@ -148,6 +179,29 @@
     </div>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+const monthly = {{ forecast.monthly | tojson }};
+const labels = monthly.map(m => m.label);
+const fact = monthly.map(m => m.kind === 'fact' ? m.amount : 0);
+const pred = monthly.map(m => m.kind === 'forecast' ? m.amount : 0);
+new Chart(document.getElementById('incomeChart'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      { label: 'Факт', data: fact, backgroundColor: 'rgba(25, 135, 84, 0.75)' },
+      { label: 'Прогноз', data: pred, backgroundColor: 'rgba(13, 110, 253, 0.65)' }
+    ]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      x: { stacked: true },
+      y: { beginAtZero: true, title: { display: true, text: '₽' } }
+    }
+  }
+});</script>
 </body>
 </html>
 

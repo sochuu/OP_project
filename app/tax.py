@@ -87,6 +87,21 @@ def ndfl_tax(income: float, rate_percent: float = 13.0) -> TaxBreakdown:
     )
 
 
+def remaining_npd_bonus(start: float, earnings: list) -> float:
+    """Остаток вычета после фактических доходов (1% ФЛ, 2% ЮЛ), по дате."""
+    left = max(0.0, min(float(start), NPD_BONUS_MAX))
+    ordered = sorted(earnings, key=lambda e: (e.earned_on, getattr(e, "id", 0) or 0))
+    for e in ordered:
+        rate = 0.01 if e.payer_type == "fl" else 0.02
+        spent = min(left, max(0.0, float(e.amount)) * rate)
+        left = max(0.0, left - spent)
+    return round(left, 2)
+
+
+def bonus_spent(start: float, earnings: list) -> float:
+    return round(max(0.0, min(float(start), NPD_BONUS_MAX) - remaining_npd_bonus(start, earnings)), 2)
+
+
 def calc_tax(regime: str, income_fl: float, income_org: float, settings) -> TaxBreakdown:
     total = income_fl + income_org
     if regime == "npd":
