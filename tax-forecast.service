@@ -1,0 +1,14 @@
+[Unit]
+Description=Tax forecast web app
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/tax-forecast
+ExecStart=/opt/tax-forecast/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000
+Restart=on-failure
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target
