@@ -38,3 +38,7 @@ XXXX-XXXX-XXXX-XXXX
 На Linux/VPS: `./run.sh`, выдача кода — `python scripts/issue_code.py`.
 Перед продом смените `SECRET_KEY` в `.env` и перевыпустите коды (хеш зависит от секрета).
 
+
+## Используемые ресурсы
+
+Только HTML/CSS шаблон от https://www.keentodesign.com.au/web-design-templates/cyber-security-website-template/

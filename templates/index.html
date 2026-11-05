@@ -4,39 +4,42 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Прогноз налогов (РФ)</title>
+  <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/css/app.css" rel="stylesheet">
 </head>
-<body class="bg-light">
+<body class="app-skin">
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-start">
     <div>
+      <div class="app-eyebrow">кабинет</div>
       <h1 class="h3 mb-1">Прогноз налогов для фрилансера</h1>
       <p class="text-muted">РФ: НПД (4/3% физлица, 6/4% ИП/юрлица), УСН, НДФЛ.</p>
     </div>
     <a class="btn btn-outline-secondary btn-sm" href="/logout">Выйти</a>
   </div>
 
-  <div class="row g-3 mb-4">
+  <div class="row g-3 mb-4 align-items-stretch">
     <div class="col-md-4">
-      <div class="card shadow-sm">
+      <div class="card shadow-sm h-100">
         <div class="card-body">
           <div class="text-muted">Прогноз дохода {{ forecast.year }}</div>
-          <div class="fs-3">{{ "%.0f"|format(forecast.total) }} ₽</div>
+          <div class="fs-3 stat-value">{{ "%.0f"|format(forecast.total) }} ₽</div>
           <small>метод: {{ forecast.method }}, точек: {{ forecast.points_used }}</small>
         </div>
       </div>
     </div>
     <div class="col-md-4">
-      <div class="card shadow-sm">
+      <div class="card shadow-sm h-100">
         <div class="card-body">
           <div class="text-muted">Ожидаемый налог ({{ tax.regime }})</div>
-          <div class="fs-3 text-danger">{{ "%.0f"|format(tax.tax) }} ₽</div>
+          <div class="fs-3 text-danger stat-value">{{ "%.0f"|format(tax.tax) }} ₽</div>
           {% if tax.warning %}<div class="text-warning small">{{ tax.warning }}</div>{% endif %}
         </div>
       </div>
     </div>
     <div class="col-md-4">
-      <div class="card shadow-sm">
+      <div class="card shadow-sm h-100">
         <div class="card-body">
           <div class="text-muted">Структура дохода</div>
           <div>Физлица: {{ "%.0f"|format(forecast.total_fl) }} ₽</div>
@@ -73,30 +76,7 @@
             </div>
             <div class="col-12"><button class="btn btn-primary w-100">Сохранить</button></div>
           </form>
-          <p class="small text-muted mt-2 mb-0">НПД: ФЛ 4% (3% с бонусом), ИП/ЮЛ 6% (4% с бонусом). Вычет до {{ "%.0f"|format(bonus_max) }} ₽ задаётся кнопкой ниже.</p>
-        </div>
-      </div>
-      <div class="card shadow-sm mb-3">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <span>Налоговый бонус НПД</span>
-          <span class="badge text-bg-secondary">остаток {{ "%.0f"|format(bonus_now) }} ₽</span>
-        </div>
-        <div class="card-body">
-          <p class="small text-muted">Старт вычета задаётся здесь. После каждой операции остаток уменьшается: 1% от дохода ФЛ и 2% от ИП/ЮЛ. 0 ₽ — ставки полные (4% и 6%).</p>
-          <p class="small mb-2">Истрачено по операциям: <strong>{{ "%.0f"|format(bonus_used) }} ₽</strong> · сейчас: <strong>{{ "%.0f"|format(bonus_now) }} ₽</strong></p>
-          <form method="post" action="/bonus" class="row g-2 align-items-end">
-            <div class="col-7">
-              <label class="form-label small">Стартовый бонус, ₽</label>
-              <input class="form-control" type="number" name="npd_bonus_left" min="0" max="{{ bonus_max }}" step="1" value="{{ bonus_start }}">
-            </div>
-            <div class="col-5">
-              <button class="btn btn-outline-primary w-100" type="submit">Указать бонус</button>
-            </div>
-            <div class="col-12">
-              <button class="btn btn-outline-secondary btn-sm" type="button" onclick="this.form.npd_bonus_left.value=0; this.form.submit()">Бонус истрачен (0)</button>
-              <button class="btn btn-outline-secondary btn-sm" type="button" onclick="this.form.npd_bonus_left.value={{ bonus_max }}; this.form.submit()">Полный вычет ({{ "%.0f"|format(bonus_max) }})</button>
-            </div>
-          </form>
+          <p class="small text-muted mt-2 mb-0">НПД: ФЛ 4% (3% с бонусом), ИП/ЮЛ 6% (4% с бонусом). Вычет — в блоке «Налоговый бонус НПД».</p>
         </div>
       </div>
       <div class="card shadow-sm mb-3">
@@ -114,6 +94,33 @@
             <div class="col-6"><input class="form-control" name="note" placeholder="Комментарий"></div>
             <div class="col-12"><button class="btn btn-success w-100">Добавить</button></div>
           </form>
+        </div>
+      </div>
+      <div class="card shadow-sm mb-3 bonus-card">
+        <button class="card-header bonus-toggle collapsed d-flex justify-content-between align-items-center w-100 text-start"
+                type="button" data-bs-toggle="collapse" data-bs-target="#npdBonusPanel"
+                aria-expanded="false" aria-controls="npdBonusPanel">
+          <span>Налоговый бонус НПД</span>
+          <span class="badge text-bg-light text-muted fw-normal">остаток {{ "%.0f"|format(bonus_now) }} ₽</span>
+        </button>
+        <div id="npdBonusPanel" class="collapse">
+          <div class="card-body pt-2">
+            <p class="small text-muted">Старт вычета задаётся здесь. После каждой операции остаток уменьшается: 1% от дохода ФЛ и 2% от ИП/ЮЛ. 0 ₽ — ставки полные (4% и 6%).</p>
+            <p class="small mb-2 text-muted">Истрачено по операциям: {{ "%.0f"|format(bonus_used) }} ₽ · сейчас: {{ "%.0f"|format(bonus_now) }} ₽</p>
+            <form method="post" action="/bonus" class="row g-2 align-items-end">
+              <div class="col-7">
+                <label class="form-label small">Стартовый бонус, ₽</label>
+                <input class="form-control form-control-sm" type="number" name="npd_bonus_left" min="0" max="{{ bonus_max }}" step="1" value="{{ bonus_start }}">
+              </div>
+              <div class="col-5">
+                <button class="btn btn-outline-secondary btn-sm w-100" type="submit">Указать бонус</button>
+              </div>
+              <div class="col-12">
+                <button class="btn btn-outline-secondary btn-sm" type="button" onclick="this.form.npd_bonus_left.value=0; this.form.submit()">Бонус истрачен (0)</button>
+                <button class="btn btn-outline-secondary btn-sm" type="button" onclick="this.form.npd_bonus_left.value={{ bonus_max }}; this.form.submit()">Полный вычет ({{ "%.0f"|format(bonus_max) }})</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
       <div class="card shadow-sm">
@@ -154,23 +161,52 @@
           </table>
         </div>
       </div>
+    </div>
+  </div>
+  <div class="row g-4 mt-1">
+    <div class="col-12">
       <div class="card shadow-sm">
         <div class="card-header">Операции</div>
+        <div class="card-body py-2">
+          <form method="get" action="/" class="row g-2 align-items-end">
+            <div class="col-md-5">
+              <label class="form-label small mb-0">Комментарий</label>
+              <input class="form-control form-control-sm" name="q" value="{{ q }}" placeholder="поиск по комментарию">
+            </div>
+            <div class="col-md-5">
+              <label class="form-label small mb-0">Сортировка</label>
+              <select name="sort" class="form-select form-select-sm">
+                <option value="date_desc" {% if sort=='date_desc' %}selected{% endif %}>Дата: новее</option>
+                <option value="date_asc" {% if sort=='date_asc' %}selected{% endif %}>Дата: старее</option>
+                <option value="amount_desc" {% if sort=='amount_desc' %}selected{% endif %}>Сумма: убывание</option>
+                <option value="amount_asc" {% if sort=='amount_asc' %}selected{% endif %}>Сумма: возрастание</option>
+                <option value="payer_fl" {% if sort=='payer_fl' %}selected{% endif %}>Сначала физлица</option>
+                <option value="payer_org" {% if sort=='payer_org' %}selected{% endif %}>Сначала ИП/юрлица</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-outline-secondary btn-sm w-100" type="submit">Показать</button>
+            </div>
+          </form>
+        </div>
         <div class="table-responsive">
           <table class="table table-sm mb-0">
-            <thead><tr><th>Дата</th><th>Сумма</th><th>Плательщик</th><th></th></tr></thead>
+            <thead><tr><th>Дата</th><th>Сумма</th><th>Плательщик</th><th>Комментарий</th><th></th></tr></thead>
             <tbody>
             {% for e in earnings %}
               <tr>
                 <td>{{ e.earned_on }}</td>
                 <td>{{ "%.2f"|format(e.amount) }}</td>
                 <td>{{ 'ФЛ' if e.payer_type=='fl' else 'ИП/ЮЛ' }}</td>
+                <td class="small text-muted">{{ e.note or '—' }}</td>
                 <td>
                   <form method="post" action="/earnings/{{ e.id }}/delete">
                     <button class="btn btn-outline-danger btn-sm">x</button>
                   </form>
                 </td>
               </tr>
+            {% else %}
+              <tr><td colspan="5" class="text-muted small">Нет операций{% if q %} по запросу{% endif %}.</td></tr>
             {% endfor %}
             </tbody>
           </table>
@@ -179,6 +215,7 @@
     </div>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script>
 const monthly = {{ forecast.monthly | tojson }};
@@ -190,8 +227,8 @@ new Chart(document.getElementById('incomeChart'), {
   data: {
     labels,
     datasets: [
-      { label: 'Факт', data: fact, backgroundColor: 'rgba(25, 135, 84, 0.75)' },
-      { label: 'Прогноз', data: pred, backgroundColor: 'rgba(13, 110, 253, 0.65)' }
+      { label: 'Факт', data: fact, backgroundColor: 'rgba(15, 35, 95, 0.8)' },
+      { label: 'Прогноз', data: pred, backgroundColor: 'rgba(240, 68, 5, 0.7)' }
     ]
   },
   options: {
@@ -202,6 +239,7 @@ new Chart(document.getElementById('incomeChart'), {
     }
   }
 });</script>
+{% include "footer.html" %}
 </body>
 </html>
 
