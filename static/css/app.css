@@ -1,0 +1,153 @@
+@font-face {
+  font-family: "Caveat";
+  src: url("../fonts/Caveat-Regular.woff2") format("woff2"),
+       url("../fonts/Caveat-Regular.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("../fonts/Inter-Regular.woff2") format("woff2"),
+       url("../fonts/Inter-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("../fonts/Inter-Medium.woff2") format("woff2"),
+       url("../fonts/Inter-Medium.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("../fonts/Inter-Bold.woff2") format("woff2"),
+       url("../fonts/Inter-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --ink: #010101;
+  --muted: #4d4e4d;
+  --accent: #f04405;
+  --accent-soft: #f9703e;
+  --navy: #0f235f;
+  --paper: #f6f3ef;
+}
+
+body.app-skin {
+  font-family: Inter, system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.app-eyebrow {
+  font-family: Caveat, cursive;
+  color: var(--accent);
+  font-size: 1.6rem;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.app-skin .card {
+  border: 0;
+  border-radius: 16px;
+}
+
+.app-skin .card-header {
+  background: #fff;
+  font-weight: 500;
+  border-bottom: 1px solid #eee;
+}
+
+.app-skin .btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.app-skin .btn-primary:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+}
+.app-skin .btn-success {
+  background: var(--navy);
+  border-color: var(--navy);
+}
+.app-skin .btn-outline-primary {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.app-skin .btn-outline-primary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.app-skin .stat-value { letter-spacing: -0.5px; }
+.app-skin .text-muted { color: var(--muted) !important; }
+.app-skin .table-info { --bs-table-bg: #fff3ee; }
+.app-skin a { color: var(--accent); }
+
+.bonus-card {
+  opacity: 0.72;
+  box-shadow: none !important;
+  border: 1px dashed #d9d4cc !important;
+  background: #f3efe9;
+}
+.bonus-card:hover,
+.bonus-card:focus-within {
+  opacity: 1;
+}
+.bonus-toggle {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--muted);
+  padding: 0.7rem 1rem;
+}
+.bonus-toggle:not(.collapsed) {
+  color: var(--ink);
+}
+.bonus-toggle .badge {
+  border: 1px solid #ddd;
+}
+
+.login-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.login-shell .brand-mark {
+  width: 135px;
+  height: auto;
+  margin-bottom: 1rem;
+}
+.login-shell .site-footer {
+  margin-top: auto;
+  width: 100%;
+}
+
+.site-footer {
+  margin-top: 2.5rem;
+  padding: 1.25rem 0 1.75rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.site-footer a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.site-footer a:hover {
+  color: var(--accent);
+}
+.site-footer .sep {
+  margin: 0 0.55rem;
+  color: #c8c3bb;
+}

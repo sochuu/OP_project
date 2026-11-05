@@ -110,10 +110,31 @@ def logout():
 
 
 @app.get("/")
-def index(request: Request, db: Session = Depends(get_db)):
+def index(
+    request: Request,
+    db: Session = Depends(get_db),
+    sort: str = "date_desc",
+    q: str = "",
+):
     s = get_settings(db)
     all_earnings = db.query(Earning).order_by(Earning.earned_on.asc(), Earning.id.asc()).all()
-    earnings = list(reversed(all_earnings))
+    query = (q or "").strip()
+    listed = list(all_earnings)
+    if query:
+        needle = query.casefold()
+        listed = [e for e in listed if needle in (e.note or "").casefold()]
+    keys = {
+        "date_asc": lambda e: (e.earned_on, e.id),
+        "date_desc": lambda e: (e.earned_on, e.id),
+        "amount_asc": lambda e: (e.amount, e.earned_on, e.id),
+        "amount_desc": lambda e: (e.amount, e.earned_on, e.id),
+        "payer_fl": lambda e: (0 if e.payer_type == "fl" else 1, e.earned_on, e.id),
+        "payer_org": lambda e: (0 if e.payer_type == "org" else 1, e.earned_on, e.id),
+    }
+    if sort not in keys:
+        sort = "date_desc"
+    reverse = sort in {"date_desc", "amount_desc"}
+    earnings = sorted(listed, key=keys[sort], reverse=reverse)
     fc = forecast_year(all_earnings, s.financial_year)
     tax = calc_tax(s.tax_regime, fc["total_fl"], fc["total_org"], s)
     bonus_now = remaining_npd_bonus(s.npd_bonus_left, all_earnings)
@@ -130,6 +151,8 @@ def index(request: Request, db: Session = Depends(get_db)):
             "bonus_start": s.npd_bonus_left,
             "bonus_now": bonus_now,
             "bonus_used": bonus_spent(s.npd_bonus_left, all_earnings),
+            "sort": sort,
+            "q": query,
         },
     )
 
