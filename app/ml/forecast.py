@@ -1,7 +1,5 @@
 """Прогноз месячного дохода.
 
-По умолчанию — линейная регрессия на NumPy (МНК), без scikit-learn.
-Sklearn: FORECAST_BACKEND=sklearn (если пакет установлен).
 """
 
 from __future__ import annotations
