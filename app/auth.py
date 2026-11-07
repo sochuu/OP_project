@@ -80,10 +80,18 @@ def append_hash(code: str) -> str:
 
 
 def code_is_valid(code: str) -> bool:
+    return valid_code_hash(code) is not None
+
+
+def valid_code_hash(code: str) -> str | None:
+    """HMAC кода, если он есть в списке выданных; иначе None."""
     norm = normalize_code(code)
     if not norm or not CODE_RE.match(norm):
-        return False
-    return hash_code(norm) in load_hashes()
+        return None
+    digest = hash_code(norm)
+    if digest in load_hashes():
+        return digest
+    return None
 
 
 def client_ip(request) -> str:

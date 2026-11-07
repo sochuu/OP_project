@@ -10,6 +10,7 @@ class Earning(Base):
     __tablename__ = "earnings"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    owner_hash: Mapped[str] = mapped_column(String(64), nullable=False, default="", index=True)
     earned_on: Mapped[date] = mapped_column(Date, nullable=False, index=True)
     amount: Mapped[float] = mapped_column(Float, nullable=False)
     # fl — физлицо; org — ИП/юрлицо
@@ -21,7 +22,8 @@ class Earning(Base):
 class Settings(Base):
     __tablename__ = "settings"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    owner_hash: Mapped[str] = mapped_column(String(64), nullable=False, default="", unique=True, index=True)
     tax_regime: Mapped[str] = mapped_column(String(16), default="npd")
     usn_rate: Mapped[float] = mapped_column(Float, default=6.0)
     ndfl_rate: Mapped[float] = mapped_column(Float, default=13.0)
